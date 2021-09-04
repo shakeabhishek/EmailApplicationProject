@@ -13,9 +13,9 @@ public class UserEmailMapping {
     @Column(name="id", updatable = false, nullable = false)
     private UUID id;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "EMAIL_DETAILS_ID", referencedColumnName = "ID")
-    private UUID emailDetailsId; // Id from the EmailDetails entity
+    private EmailDetails emailDetailsId; // Id from the EmailDetails entity
     private UUID toUser;
     private UUID fromUser;
     private int status; // 0 -> Active (not deleted), 1 -> Deleted
@@ -23,7 +23,7 @@ public class UserEmailMapping {
     public UserEmailMapping() {
     }
 
-    public UserEmailMapping(UUID emailId, UUID to, UUID from, int status) {
+    public UserEmailMapping(EmailDetails emailId, UUID to, UUID from, int status) {
         this.emailDetailsId = emailId;
         this.toUser = to;
         this.fromUser = from;
@@ -38,11 +38,11 @@ public class UserEmailMapping {
         this.id = id;
     }
 
-    public UUID getEmailDetailsId() {
+    public EmailDetails getEmailDetailsId() {
         return emailDetailsId;
     }
 
-    public void setEmailDetailsId(UUID emailDetailsId) {
+    public void setEmailDetailsId(EmailDetails emailDetailsId) {
         this.emailDetailsId = emailDetailsId;
     }
 

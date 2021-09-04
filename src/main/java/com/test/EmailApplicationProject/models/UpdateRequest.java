@@ -1,33 +1,17 @@
 package com.test.EmailApplicationProject.models;
 
-import javax.persistence.*;
-
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class UpdateRequest {
     private String firstName;
     private String lastName;
-    private String email;
     private String password;
 
-    public User(String firstName, String lastName, String email, String password) {
+    public UpdateRequest() {
+    }
+
+    public UpdateRequest(String firstName, String lastName, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
         this.password = password;
-    }
-
-    public User() {}
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFirstName() {
@@ -44,14 +28,6 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {

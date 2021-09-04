@@ -14,15 +14,15 @@ public class EmailDetails {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "FROM_USER", referencedColumnName = "ID")
-    private UUID fromUserId;
+    @JoinColumn(name = "FROM_USER_ID", referencedColumnName = "ID")
+    private User fromUserId;
     private String subject;
     private String body;
 
     public EmailDetails() {
     }
 
-    public EmailDetails(UUID fromUserId, String subject, String body) {
+    public EmailDetails(User fromUserId, String subject, String body) {
         this.fromUserId = fromUserId;
         this.subject = subject;
         this.body = body;
@@ -36,11 +36,11 @@ public class EmailDetails {
         this.id = id;
     }
 
-    public UUID getFromUserId() {
+    public User getFromUserId() {
         return fromUserId;
     }
 
-    public void setFromUserId(UUID fromUser) {
+    public void setFromUserId(User fromUser) {
         this.fromUserId = fromUser;
     }
 

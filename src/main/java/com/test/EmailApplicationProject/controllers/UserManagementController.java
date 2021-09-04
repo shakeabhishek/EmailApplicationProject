@@ -1,10 +1,7 @@
 package com.test.EmailApplicationProject.controllers;
 
 import com.test.EmailApplicationProject.exceptions.LoginException;
-import com.test.EmailApplicationProject.models.LoginRequest;
-import com.test.EmailApplicationProject.models.LoginResponse;
-import com.test.EmailApplicationProject.models.SignUpRequest;
-import com.test.EmailApplicationProject.models.User;
+import com.test.EmailApplicationProject.models.*;
 import com.test.EmailApplicationProject.repositories.UserRepository;
 import com.test.EmailApplicationProject.services.MyUserDetailsService;
 import com.test.EmailApplicationProject.utils.JwtUtil;
@@ -17,6 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class UserManagementController {
@@ -75,9 +75,48 @@ public class UserManagementController {
         return "Hello, this endpoint is secured!";
     }
 
+    // Getting username (email) from jwt
     @GetMapping("/welcome")
     public String welcome(@RequestHeader(value="Authorization") String token) {
         String jwt = token.substring(7); //Bearer" "
         return "Welcome!, " + jwtUtil.extractUsername(jwt);
     }
+
+    @PutMapping("/api/user")
+    public String updateUser(@RequestHeader(value="Authorization") String token, @RequestBody UpdateRequest updateRequest) {
+        String email = jwtUtil.extractUsername(token.substring(7));
+        User user = userRepository.findByEmail(email);
+        String hashedUpdatedPassword = null;
+        if(!updateRequest.getPassword().equals(""))
+        {
+            hashedUpdatedPassword = bCryptPasswordEncoder.encode(updateRequest.getPassword());
+        }
+
+        String updatedFirstName = user.getFirstName().equals(updateRequest.getFirstName()) || updateRequest.getFirstName().equals("") ? user.getFirstName() : updateRequest.getFirstName();
+        String updatedLastName = user.getLastName().equals(updateRequest.getLastName()) || updateRequest.getLastName().equals("") ? user.getLastName() : updateRequest.getLastName();
+        String updatedPassword = hashedUpdatedPassword == null || user.getPassword().equals(hashedUpdatedPassword) ? user.getPassword() : hashedUpdatedPassword;
+
+        userRepository.updateUser(user.getId(), updatedFirstName, updatedLastName, email, updatedPassword);
+        return "Updated user with the email: " + email;
+    }
+
+    @DeleteMapping("/api/user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") int id, @RequestHeader("Authorization") String token) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()) {
+            String email = user.get().getEmail();
+            System.out.println(email);
+            String jwtEmail = jwtUtil.extractUsername(token.substring(7));
+            if(email.equals(jwtEmail)) {
+                userRepository.deleteById(id);
+                return new ResponseEntity<String>("User with ID: " + id + " and email: " + email + " was deleted.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<String>("You can only delete your email account!", HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return new ResponseEntity<String>("User with ID: " + id + " does not exist!", HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 }
