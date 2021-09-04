@@ -37,10 +37,13 @@ public class UserManagementController {
 
     @PostMapping("/api/signup")
     public ResponseEntity <?> signupUser(@RequestBody SignUpRequest signup) {
-        System.out.println(signup);
+        String domain = signup.getEmail().split("@")[1];
+        if (!domain.equals("email.com")) {
+            return new ResponseEntity<>("Please register your email with @email.com domain!", HttpStatus.BAD_REQUEST);
+        }
         User user = userRepository.findByEmail(signup.getEmail());
         if(user != null) {
-            return new ResponseEntity<>("Email is taken! Please use a different e-mail id to sign-up.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Email is already taken! Please use a different e-mail id to sign-up.", HttpStatus.BAD_REQUEST);
         } else {
             userRepository.save(new User(signup.getFirstName(), signup.getLastName(), signup.getEmail(), bCryptPasswordEncoder.encode(signup.getPassword())));
             return new ResponseEntity<>("Email: " + signup.getEmail() + " successfully registered!", HttpStatus.CREATED);
